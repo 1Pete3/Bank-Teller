@@ -4,12 +4,17 @@ using namespace std;
 
 // Function that asks for user input for the account number, first name, last name
 void getInfo(){
-    char fName [15], lname[20];
+    char fName [15], lName[20], accountNumber[12];
+
     cout << "Enter the customners first name: ";
     cin >> fName;
 
     cout << "Enter the customners last name: ";
-    cin >> fName;
+    cin >> lName;
+
+    // can change this to int to show vulnerability if account number > max int value etc..
+    cout << "Enter the customners account #: ";
+    cin >> accountNumber;
     
 }
 
