@@ -14,8 +14,6 @@ class Person
         /* *Buffer Overrun* can occur here if the user enters a string greater than the size of
             fName, lName, account number
         */
-        char fName [15], lName[20], accountNumber[12];
-
         cout << "Enter the customers first name: ";
         cin >> fName;
 
