@@ -4,7 +4,7 @@
 using namespace std;
 
 // terminal colors - https://man7.org/linux/man-pages/man5/terminal-colors.d.5.html
-
+// https://stackoverflow.com/questions/4053837/colorizing-text-in-the-console-with-c
 
 //test
 // Function that asks for user input for the account number, first name, last name
@@ -43,7 +43,8 @@ void deposit()
             cout << "Amount of cash deposited: ";
         }    
         else {
-            cout << "\033[31mIncorrect Input enter cash or check\033[0m" << endl;
+            // \033 is to change the text color, [31 - red text, 103m - yellow background for linux
+            cout << "\033[31;103mIncorrect Input enter cash or check\033[0m" << endl;
         }
             
     }
