@@ -6,7 +6,22 @@ using namespace std;
 // terminal colors - https://man7.org/linux/man-pages/man5/terminal-colors.d.5.html
 // https://stackoverflow.com/questions/4053837/colorizing-text-in-the-console-with-c
 
-//test
+// Function to create a menu 
+void menu()
+{
+cout<<"|=============================|"<< endl;
+cout<<"|             MENU            |"<< endl;
+cout<<"|=============================|"<< endl;
+cout<<"| 1.Create an account"<<"         |"<< endl;
+cout<<"| 2.Delete an account"<<"         |"<< endl;
+cout<<"| 3.Deposit"<<"                   |"<< endl;
+cout<<"| 4.Widthdraw"<<"                 |"<< endl;
+cout<<"| 5.Check balance"<<"             |"<< endl;
+cout<<"| 6.Apply fee"<<"                 |"<< endl;
+cout<<"| 7.Exit"<<"                      |"<< endl;
+cout<<"==============================="<< endl;
+}
+
 // Function that asks for user input for the account number, first name, last name
 void getInfo(){
     /* *Buffer Overrun* can occur here if the user enters a string greater than the size of
@@ -44,6 +59,7 @@ void deposit()
         }    
         else {
             // \033 is to change the text color, [31 - red text, 103m - yellow background for linux
+            // \033[0m is to reset the text color/background             
             cout << "\033[31;103mIncorrect Input enter cash or check\033[0m" << endl;
         }
             
@@ -77,11 +93,20 @@ int main(int argc, char** argv)
         cout <<"overdraft Selected"<<endl;
         getInfo();
     }
+    else if(argc == 2 &&strcmp(argv[1],"overdraft")==0)
+    {
+        getInfo();
+    }
+    else if(argc == 2 &&strcmp(argv[1],"menu")==0)
+    {
+        menu();
+    }    
     else {
-    cout << "Use ./a.out deposit for a deposit" <<endl;
-    cout << "Use ./a.out widthdraw for a widthdraw" <<endl;
-    cout << "Use ./a.out balance for a balance inquiry" <<endl;
-    cout << "Use ./a.out overdraft to apply an overdraft fee" <<endl;
+        cout << "\033[36mUse ./a.out deposit for a deposit" <<endl;
+        cout << "Use ./a.out widthdraw for a widthdraw" <<endl;
+        cout << "Use ./a.out balance for a balance inquiry" <<endl;
+        cout << "Use ./a.out overdraft to apply an overdraft fee" <<endl;
+        cout << "Use ./a.out menu to access the menu\033[0m"<<endl;
     }
 	return 0;
 }
