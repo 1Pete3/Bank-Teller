@@ -1,9 +1,17 @@
 #include <iostream>
-#include<string.h>
+#include <string.h>
+#include <stdlib.h>
 using namespace std;
+
+// terminal colors - https://man7.org/linux/man-pages/man5/terminal-colors.d.5.html
+
+
 //test
 // Function that asks for user input for the account number, first name, last name
 void getInfo(){
+    /* *Buffer Overrun* can occur here if the user enters a string greater than the size of
+        fName, lName, account number
+    */
     char fName [15], lName[20], accountNumber[12];
 
     cout << "Enter the customers first name: ";
@@ -12,7 +20,7 @@ void getInfo(){
     cout << "Enter the customers last name: ";
     cin >> lName;
 
-    // can change this to int to show vulnerability if account number > max int value etc..
+    
     cout << "Enter the customers account #: ";
     cin >> accountNumber;
     
@@ -23,25 +31,27 @@ void deposit()
     char depositType [6];
     do{
         cout << "Is this a cash or check deposit?: ";
+        // *Buffer Overrun* can occur here if the user enters a string greater than the size of depositType 
         cin >> depositType;
         if (strcmp("cash",depositType)==0) {
-            cout << "cash deposit" << endl;
+            cout << "Cash deposit selected" << endl;
+            cout << "Amount of cash deposited: ";
             }
         else if (strcmp("check",depositType)==0)
         {
-            cout << "check deposit" << endl;
+            cout << "check deposit selected" << endl;
+            cout << "Amount of cash deposited: ";
         }    
         else {
-            cout << "Incorrect Input enter cash or check" << endl;
+            cout << "\033[31mIncorrect Input enter cash or check\033[0m" << endl;
         }
             
     }
     while((strcmp("cash",depositType)!=0)&&(strcmp("check",depositType)!=0));
-    
-    
 }
 
-//command line arguments for bank transaction
+//command line arguments for bank transactions
+// *Command Injection* can occur here if the user adds ; after deposit or any other transaction
 int main(int argc, char** argv)
 {
     // selects type of transaction
