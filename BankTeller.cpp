@@ -21,13 +21,24 @@ void getInfo(){
 void deposit()
 {
     char depositType [6];
-    cout << "Is this a cash or check deposit?: ";
-    cin >> depositType;
-    if (strcmp("cash",depositType)==0) {
-    cout << "cash deposit" << endl;
-    }    
-    else if(strcmp("check",depositType)==0)
-    cout << "check deposit" << endl;
+    do{
+        cout << "Is this a cash or check deposit?: ";
+        cin >> depositType;
+        if (strcmp("cash",depositType)==0) {
+            cout << "cash deposit" << endl;
+            }
+        else if (strcmp("check",depositType)==0)
+        {
+            cout << "check deposit" << endl;
+        }    
+        else {
+            cout << "Incorrect Input enter cash or check" << endl;
+        }
+            
+    }
+    while((strcmp("cash",depositType)!=0)&&(strcmp("check",depositType)!=0));
+    
+    
 }
 
 //command line arguments for bank transaction
