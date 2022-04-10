@@ -3,6 +3,34 @@
 #include <stdlib.h>
 using namespace std;
 
+class Person
+{
+    private: 
+    char fName [15], lName[20], accountNumber[12];
+
+    public: 
+    // Function that asks for user input for the account number, first name, last name
+    void getInfo(){
+        /* *Buffer Overrun* can occur here if the user enters a string greater than the size of
+            fName, lName, account number
+        */
+        char fName [15], lName[20], accountNumber[12];
+
+        cout << "Enter the customers first name: ";
+        cin >> fName;
+
+        cout << "Enter the customers last name: ";
+        cin >> lName;
+        
+        cout << "Enter the customers account #: ";
+        cin >> accountNumber;
+    }
+    
+};
+
+
+
+
 // terminal colors - https://man7.org/linux/man-pages/man5/terminal-colors.d.5.html
 // https://stackoverflow.com/questions/4053837/colorizing-text-in-the-console-with-c
 
@@ -22,24 +50,7 @@ cout<<"| 7.Exit"<<"                      |"<< endl;
 cout<<"==============================="<< endl;
 }
 
-// Function that asks for user input for the account number, first name, last name
-void getInfo(){
-    /* *Buffer Overrun* can occur here if the user enters a string greater than the size of
-        fName, lName, account number
-    */
-    char fName [15], lName[20], accountNumber[12];
 
-    cout << "Enter the customers first name: ";
-    cin >> fName;
-
-    cout << "Enter the customers last name: ";
-    cin >> lName;
-
-    
-    cout << "Enter the customers account #: ";
-    cin >> accountNumber;
-    
-}
 
 void deposit()
 {
@@ -74,28 +85,33 @@ int main(int argc, char** argv)
     // selects type of transaction
 	if (argc == 2 && strcmp(argv[1],"deposit")==0){
         printf("Deposit Selected\n");
-        getInfo();
+        Person obj;
+        obj.getInfo();
         deposit();
 
     }
     else if(argc == 2 &&strcmp(argv[1],"widthdraw")==0)
     {
         cout << "Widthdraw Selected" <<endl;
-        getInfo();
+        Person obj;
+        obj.getInfo();
     }
     else if(argc == 2 &&strcmp(argv[1],"balance")==0)
     {
         cout << "Balance Selected"<<endl;
-         getInfo();
+        Person obj;
+        obj.getInfo();
     }
     else if(argc == 2 &&strcmp(argv[1],"overdraft")==0)
     {
         cout <<"overdraft Selected"<<endl;
-        getInfo();
+        Person obj;
+        obj.getInfo();
     }
     else if(argc == 2 &&strcmp(argv[1],"overdraft")==0)
     {
-        getInfo();
+        Person obj;
+        obj.getInfo();
     }
     else if(argc == 2 &&strcmp(argv[1],"menu")==0)
     {
