@@ -1,3 +1,4 @@
+#include <cctype>
 #include <cstdio>
 #include <iostream>
 #include <fstream>
@@ -29,7 +30,7 @@ class Person
     string getFirstName() 
     {
         cout << "Enter the customers first name: ";
-        cin >> fName;
+        cin >> fName;        
         return fName;
     }
     string getLastName() 
@@ -56,6 +57,7 @@ class Person
     {
         cout << "Enter the state (2 letter abbrivation): ";
         cin >> state;
+        // Capitalizes the state entered
         for(int i = 0; i < strlen(state);i++)
         {
            state[i] = toupper(state[i]);
@@ -139,35 +141,70 @@ void menu()
 int createAccount()
 {
     Person obj;
-    account.open("account.csv", std::ios::out);
-     if(!account)
-   {
-       cout<<"Error in creating file!!!";
-       return 0;
-   }
-   account << "Firstname,Lastname,Account#,Address,Town,State,Zipcode,Time(EST),Date"<<endl;
-   account << obj.getFirstName();
-   account << ",";
-   account << obj.getLastName();
-   account << ",";
-   account << generateAccountNumber();
-   account << ",";
-   account << obj.getHouseNumStreet();
-   account << ",";
-   account << obj.getTown();
-   account << ",";
-   account << obj.getState();
-   account << ",";
-   account << obj.getZipcode();
-   account << ",";
-   //Time formated in HH:MM:SS using setw to set width to 2 and fill 0 where needed
-   account << setw(2) << setfill('0') << (ptm->tm_hour+EST)%24 <<":" << setw(2) << setfill('0') << ptm->tm_min<<":" << setw(2) << setfill('0') << ptm->tm_sec;
-   account << ",";
-   account << setw(2) << setfill('0') << (ptm->tm_mon+1)%12 <<"/" << setw(2) << setfill('0') << ptm->tm_mday<<"/" << setw(4) << setfill('0') << ptm->tm_year+1900;
-
-   cout<<"File created successfully."<<endl;
-   account.close();
-   continueExit();
+    account.open("account.csv");
+    if(account)
+    {
+        cout << "File account.csv exits, appending to it" << endl;          
+        account.close();
+        account.open("account.csv",std::ios::app);
+        account << obj.getFirstName();
+        account << ",";
+        account << obj.getLastName();
+        account << ",";
+        account << generateAccountNumber();
+        account << ",";
+        account << obj.getHouseNumStreet();
+        account << ",";
+        account << obj.getTown();
+        account << ",";
+        account << obj.getState();
+        account << ",";
+        account << obj.getZipcode();
+        account << ",";
+        //Time formated in HH:MM:SS using setw to set width to 2 and fill 0 where needed
+        account << setw(2) << setfill('0') << (ptm->tm_hour+EST)%24 <<":" << setw(2) << setfill('0') << ptm->tm_min<<":" << setw(2) << setfill('0') << ptm->tm_sec;
+        account << ",";
+        account << setw(2) << setfill('0') << (ptm->tm_mon+1)%12 <<"/" << setw(2) << setfill('0') << ptm->tm_mday<<"/" << setw(4) << setfill('0') << ptm->tm_year+1900 ;
+        account << "\n";
+        cout<<"File created successfully."<<endl;
+        account.close();
+        continueExit();
+    }
+    else 
+    {
+        cout << "Creating file account.csv" << endl;
+        account.open("account.csv", std::ios::out);
+        if(!account)
+        {
+            cout<<"Error in creating file!!!";
+            return 0;
+        }
+        else 
+        {
+            account << "Firstname,Lastname,Account#,Address,Town,State,Zipcode,Time(EST),Date"<<endl;
+            account << obj.getFirstName();
+            account << ",";
+            account << obj.getLastName();
+            account << ",";
+            account << generateAccountNumber();
+            account << ",";
+            account << obj.getHouseNumStreet();
+            account << ",";
+            account << obj.getTown();
+            account << ",";
+            account << obj.getState();
+            account << ",";
+            account << obj.getZipcode();
+            account << ",";
+            //Time formated in HH:MM:SS using setw to set width to 2 and fill 0 where needed
+            account << setw(2) << setfill('0') << (ptm->tm_hour+EST)%24 <<":" << setw(2) << setfill('0') << ptm->tm_min<<":" << setw(2) << setfill('0') << ptm->tm_sec;
+            account << ",";
+            account << setw(2) << setfill('0') << (ptm->tm_mon+1)%12 <<"/" << setw(2) << setfill('0') << ptm->tm_mday<<"/" << setw(4) << setfill('0') << ptm->tm_year+1900;
+            cout<<"File created successfully."<<endl;
+            account.close();
+            continueExit();
+        }
+    } 
    return 0;
 }
 
