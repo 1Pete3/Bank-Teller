@@ -1,31 +1,79 @@
+#include <cstdio>
 #include <iostream>
+#include <fstream>
 #include <string.h>
 #include <stdlib.h>
+#include <iomanip>
+#include <random>
+#include <climits>
+#include <string>
+#include <tuple>
+
+
 using namespace std;
+
+fstream account;
 
 class Person
 {
     private: 
-    char fName [15], lName[20], accountNumber[12];
+    char fName [15], lName[20],houseNumStreetName[20],town[20],state[3],zipcode[6];
 
     public: 
-    // Function that asks for user input for the account number, first name, last name
-    void getInfo(){
-        /* *Buffer Overrun* can occur here if the user enters a string greater than the size of
-            fName, lName, account number
+    /* *Buffer Overrun* can occur here if the user enters a string greater than the size of
+            fName, lName
         */
+    string getFirstName() 
+    {
         cout << "Enter the customers first name: ";
         cin >> fName;
-
+        return fName;
+    }
+    string getLastName() 
+    {
         cout << "Enter the customers last name: ";
         cin >> lName;
-        
-        cout << "Enter the customers account #: ";
-        cin >> accountNumber;
+        return lName;
     }
+    string getHouseNumStreet()
+    {
+        cout << "Enter the house number and street name : ";
+        // use ignore() to clear buffer so that cin is not skipped
+        cin.ignore();
+        cin.getline(houseNumStreetName,20);
+        return houseNumStreetName;
+    }
+    string getTown()
+    {        
+        cout << "Enter the town: ";
+        cin.getline(town,20);
+        return town;
+    }
+    string getState()
+    {
+        cout << "Enter the state: ";
+        cin >> state;
+        return state;
+    }
+    string getZipcode()
+    {
+        cout << "Enter the zipcode: ";
+        cin >> zipcode;
+        return zipcode;
+    }
+
     
 };
-
+// Taken from the inclass example of generating random numbers
+    unsigned int generateAccountNumber(){
+    random_device r;
+    seed_seq seed {r(), r(), r(), r(), r(), r(), r(), r(), r(), r()};
+    mt19937 engine{seed};
+            
+    // range is from 1000000000 - INT_MAX
+    uniform_int_distribution<> dist(1000000000, INT_MAX);
+    return dist(engine);
+};
 
 
 
@@ -46,6 +94,36 @@ cout<<"| 5.Check balance"<<"             |"<< endl;
 cout<<"| 6.Apply fee"<<"                 |"<< endl;
 cout<<"| 7.Exit"<<"                      |"<< endl;
 cout<<"==============================="<< endl;
+}
+
+
+//Creates a csv file with the account information
+int createAccount()
+{
+    Person obj;
+    account.open("account.csv", std::ios::out);
+     if(!account)
+   {
+       cout<<"Error in creating file!!!";
+       return 0;
+   }
+   account << "Firstname,Lastname,Account#,Address,Town,State,Zipcode"<<endl;
+   account << obj.getFirstName();
+   account << ",";
+   account << obj.getLastName();
+   account << ",";
+   account << generateAccountNumber();
+   account << ",";
+   account << obj.getHouseNumStreet();
+   account << ",";
+   account << obj.getTown();
+   account << ",";
+   account << obj.getState();
+   account << ",";
+   account << obj.getZipcode();
+   cout<<"File created successfully.";
+   account.close();
+   return 0;
 }
 
 
@@ -84,7 +162,6 @@ int main(int argc, char** argv)
 	if (argc == 2 && strcmp(argv[1],"deposit")==0){
         printf("Deposit Selected\n");
         Person obj;
-        obj.getInfo();
         deposit();
 
     }
@@ -92,34 +169,40 @@ int main(int argc, char** argv)
     {
         cout << "Widthdraw Selected" <<endl;
         Person obj;
-        obj.getInfo();
+   
     }
     else if(argc == 2 &&strcmp(argv[1],"balance")==0)
     {
         cout << "Balance Selected"<<endl;
         Person obj;
-        obj.getInfo();
+    
     }
     else if(argc == 2 &&strcmp(argv[1],"overdraft")==0)
     {
         cout <<"overdraft Selected"<<endl;
         Person obj;
-        obj.getInfo();
+        
     }
-    else if(argc == 2 &&strcmp(argv[1],"overdraft")==0)
+    else if(argc == 3&&strcmp(argv[1],"create")==0)
+    {
+        createAccount();
+        generateAccountNumber();
+    }
+    else if(argc == 2 &&strcmp(argv[1],"delete account")==0)
     {
         Person obj;
-        obj.getInfo();
     }
     else if(argc == 2 &&strcmp(argv[1],"menu")==0)
     {
         menu();
     }    
     else {
-        cout << "\033[36mUse ./a.out deposit for a deposit" <<endl;
+        cout << "\033[36mUse ./a.out create account to create a new bank account" <<endl;
+        cout << "Use ./a.out delete account to delete a bank account" <<endl;
+        cout << "Use ./a.out deposit for a deposit" <<endl;
         cout << "Use ./a.out widthdraw for a widthdraw" <<endl;
         cout << "Use ./a.out balance for a balance inquiry" <<endl;
-        cout << "Use ./a.out overdraft to apply an overdraft fee" <<endl;
+        cout << "Use ./a.out fee to apply a fee" <<endl;
         cout << "Use ./a.out menu to access the menu\033[0m"<<endl;
     }
 	return 0;
