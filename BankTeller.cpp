@@ -7,11 +7,14 @@
 #include <random>
 #include <climits>
 #include <string>
+#include<ctime>
 using namespace std;
-
+#define EST (-4)
+time_t rawtime;
+struct tm * ptm;
 int createAccount();
+int deleteAccount();
 void continueExit();
-
 fstream account;
 
 class Person
@@ -83,31 +86,47 @@ class Person
 // Function to create a menu 
 void menu()
 {
-int menuSelection;
-cout<<"|=============================|"<< endl;
-cout<<"|             MENU            |"<< endl;
-cout<<"|=============================|"<< endl;
-cout<<"| 1.Create an account"<<"         |"<< endl;
-cout<<"| 2.Delete an account"<<"         |"<< endl;
-cout<<"| 3.Deposit"<<"                   |"<< endl;
-cout<<"| 4.Widthdraw"<<"                 |"<< endl;
-cout<<"| 5.Check balance"<<"             |"<< endl;
-cout<<"| 6.Apply fee"<<"                 |"<< endl;
-cout<<"| 7.Exit"<<"                      |"<< endl;
-cout<<"==============================="<< endl;
-cout << "Enter a menu item number: ";
-cin >> menuSelection;
+    int menuSelection;
+    cout<<"|=============================|"<< endl;
+    cout<<"|             MENU            |"<< endl;
+    cout<<"|=============================|"<< endl;
+    cout<<"| 1.Create an account"<<"         |"<< endl;
+    cout<<"| 2.Delete an account"<<"         |"<< endl;
+    cout<<"| 3.Deposit"<<"                   |"<< endl;
+    cout<<"| 4.Widthdraw"<<"                 |"<< endl;
+    cout<<"| 5.Check balance"<<"             |"<< endl;
+    cout<<"| 6.Apply fee"<<"                 |"<< endl;
+    cout<<"| 7.Exit"<<"                      |"<< endl;
+    cout<<"==============================="<< endl;
+    cout << "Enter a menu item number: ";
+    cin >> menuSelection;
 
-switch(menuSelection)
-{
-    case 1: 
-        createAccount();
-        break;
-    case 7:
-        cout << "Goodbye :)"<<endl;
-        exit(0);
-        
-}
+    time ( &rawtime );
+    ptm = gmtime ( &rawtime );
+    switch(menuSelection)
+    {
+        case 1: 
+            createAccount();
+            break;
+        case 2: 
+            deleteAccount();
+            break;
+        case 3: 
+            createAccount();
+            break;
+        case 4: 
+            createAccount();
+            break;
+        case 5: 
+            createAccount();
+            break;
+        case 6: 
+            createAccount();
+            break;
+        case 7:
+            cout << "Goodbye :)"<<endl;
+            exit(0);
+    }
 
 }
 
@@ -122,7 +141,42 @@ int createAccount()
        cout<<"Error in creating file!!!";
        return 0;
    }
-   account << "Firstname,Lastname,Account#,Address,Town,State,Zipcode"<<endl;
+   account << "Firstname,Lastname,Account#,Address,Town,State,Zipcode,Time(EST),Date"<<endl;
+   account << obj.getFirstName();
+   account << ",";
+   account << obj.getLastName();
+   account << ",";
+   account << generateAccountNumber();
+   account << ",";
+   account << obj.getHouseNumStreet();
+   account << ",";
+   account << obj.getTown();
+   account << ",";
+   account << obj.getState();
+   account << ",";
+   account << obj.getZipcode();
+   account << ",";
+   //Time formated in HH:MM:SS using setw to set width to 2 and fill 0 where needed
+   account << setw(2) << setfill('0') << (ptm->tm_hour+EST)%24 <<":" << setw(2) << setfill('0') << ptm->tm_min<<":" << setw(2) << setfill('0') << ptm->tm_sec;
+   account << ",";
+   account << setw(2) << setfill('0') << (ptm->tm_mon+1)%12 <<"/" << setw(2) << setfill('0') << ptm->tm_mday<<"/" << setw(4) << setfill('0') << ptm->tm_year+1900;
+
+   cout<<"File created successfully."<<endl;
+   account.close();
+   continueExit();
+   return 0;
+}
+
+int deleteAccount()
+{
+    Person obj;
+    account.open("account.csv", std::ios::out);
+     if(!account)
+   {
+       cout<<"Error in creating file!!!";
+       return 0;
+   }
+   account << "Firstname,Lastname,Account#,Address,Town,State,Zipcode,Time,Date"<<endl;
    account << obj.getFirstName();
    account << ",";
    account << obj.getLastName();
