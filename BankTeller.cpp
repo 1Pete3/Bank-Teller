@@ -54,8 +54,12 @@ class Person
     }
     string getState()
     {
-        cout << "Enter the state: ";
+        cout << "Enter the state (2 letter abbrivation): ";
         cin >> state;
+        for(int i = 0; i < strlen(state);i++)
+        {
+           state[i] = toupper(state[i]);
+        }
         return state;
     }
     string getZipcode()
