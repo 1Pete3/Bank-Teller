@@ -7,10 +7,10 @@
 #include <random>
 #include <climits>
 #include <string>
-#include <tuple>
-
-
 using namespace std;
+
+int createAccount();
+void continueExit();
 
 fstream account;
 
@@ -83,6 +83,7 @@ class Person
 // Function to create a menu 
 void menu()
 {
+int menuSelection;
 cout<<"|=============================|"<< endl;
 cout<<"|             MENU            |"<< endl;
 cout<<"|=============================|"<< endl;
@@ -94,6 +95,20 @@ cout<<"| 5.Check balance"<<"             |"<< endl;
 cout<<"| 6.Apply fee"<<"                 |"<< endl;
 cout<<"| 7.Exit"<<"                      |"<< endl;
 cout<<"==============================="<< endl;
+cout << "Enter a menu item number: ";
+cin >> menuSelection;
+
+switch(menuSelection)
+{
+    case 1: 
+        createAccount();
+        break;
+    case 7:
+        cout << "Goodbye :)"<<endl;
+        exit(0);
+        
+}
+
 }
 
 
@@ -121,8 +136,9 @@ int createAccount()
    account << obj.getState();
    account << ",";
    account << obj.getZipcode();
-   cout<<"File created successfully.";
+   cout<<"File created successfully."<<endl;
    account.close();
+   continueExit();
    return 0;
 }
 
@@ -153,6 +169,21 @@ void deposit()
     }
     while((strcmp("cash",depositType)!=0)&&(strcmp("check",depositType)!=0));
 }
+
+void continueExit()
+{
+    int continueSelection;
+    cout << "\nPress 1 to return to the menu" << endl;
+    cout << "Press 2 to exit"<< endl;
+    cin >> continueSelection;
+    if(continueSelection == 1)
+        menu();
+    else
+        cout << "Goodbye :)\n"<<endl;
+        exit(0);
+
+}
+
 
 //command line arguments for bank transactions
 // *Command Injection* can occur here if the user adds ; after deposit or any other transaction
