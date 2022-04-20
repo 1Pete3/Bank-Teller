@@ -1,6 +1,7 @@
 #include <cctype>
 #include <cstdio>
 #include <iostream>
+#include <sstream>
 #include <fstream>
 #include <string.h>
 #include <stdlib.h>
@@ -8,20 +9,28 @@
 #include <random>
 #include <climits>
 #include <string>
-#include<ctime>
+#include <ctime>
+#include <cctype>
+#define EST (-6)
 using namespace std;
-#define EST (-4)
+
+char test[5];
+int createAccount(),deleteAccount();
+void continueExit(),checkInputSize(char* input,int size);
+
+vector<unsigned int> accountNums;
+
+fstream account;
 time_t rawtime;
 struct tm * ptm;
-int createAccount();
-int deleteAccount();
-void continueExit();
-fstream account;
 
 class Person
 {
+    
     private: 
-    char fName [15], lName[20],houseNumStreetName[20],town[20],state[3],zipcode[6];
+    static const int size20 = 21;
+    static const int sizeState = 3;
+    char fName [size20], lName[size20],houseNumStreetName[size20],town[size20],state[sizeState],zipcode[6];
 
     public: 
     /* *Buffer Overrun* can occur here if the user enters a string greater than the size of
@@ -30,13 +39,15 @@ class Person
     string getFirstName() 
     {
         cout << "Enter the customers first name: ";
-        cin >> fName;        
+        cin >> fName;  
+        checkInputSize(fName,size20);      
         return fName;
     }
     string getLastName() 
     {
         cout << "Enter the customers last name: ";
         cin >> lName;
+        checkInputSize(lName, size20);        
         return lName;
     }
     string getHouseNumStreet()
@@ -44,13 +55,15 @@ class Person
         cout << "Enter the house number and street name : ";
         // use ignore() to clear buffer so that cin is not skipped
         cin.ignore();
-        cin.getline(houseNumStreetName,20);
+        cin.getline(houseNumStreetName,size20);
         return houseNumStreetName;
+                
+        
     }
     string getTown()
     {        
         cout << "Enter the town: ";
-        cin.getline(town,20);
+        cin.getline(town,size20);
         return town;
     }
     string getState()
@@ -70,25 +83,20 @@ class Person
         cin >> zipcode;
         return zipcode;
     }
-
-    
-};
-// Taken from the inclass example of generating random numbers
-    unsigned int generateAccountNumber(){
-    random_device r;
-    seed_seq seed {r(), r(), r(), r(), r(), r(), r(), r(), r(), r()};
-    mt19937 engine{seed};
-            
-    // range is from 1000000000 - INT_MAX
-    uniform_int_distribution<> dist(1000000000, INT_MAX);
-    return dist(engine);
 };
 
+void checkInputSize(char* input,int size )
+    {
+        while(strlen(input) >= size )
+        {
+            cout << "\033[31;103mInput is greater than " <<  size-1 << " characters try again!\033[0m" << endl;
+            cin >> input;
+        }
 
+    }
 
 // terminal colors - https://man7.org/linux/man-pages/man5/terminal-colors.d.5.html
 // https://stackoverflow.com/questions/4053837/colorizing-text-in-the-console-with-c
-
 // Function to create a menu 
 void menu()
 {
@@ -132,43 +140,35 @@ void menu()
         case 7:
             cout << "Goodbye :)"<<endl;
             exit(0);
+        
     }
 
 }
+
+// Taken from the inclass example of generating random numbers
+    unsigned int generateAccountNumber(){
+    unsigned int accountNumber;
+    random_device r;
+    seed_seq seed {r(), r(), r(), r(), r(), r(), r(), r(), r(), r()};
+    mt19937 engine{seed};
+    // range is from 1000000000 - INT_MAX
+    uniform_int_distribution<> dist(1000000000, INT_MAX);
+    accountNumber = dist(engine);
+    return accountNumber;
+};
 
 
 //Creates a csv file with the account information
 int createAccount()
 {
     Person obj;
+    //open accounts.csv if it exists append to it, else create a new csv called account.csv
     account.open("account.csv");
     if(account)
     {
         cout << "File account.csv exits, appending to it" << endl;          
         account.close();
         account.open("account.csv",std::ios::app);
-        account << obj.getFirstName();
-        account << ",";
-        account << obj.getLastName();
-        account << ",";
-        account << generateAccountNumber();
-        account << ",";
-        account << obj.getHouseNumStreet();
-        account << ",";
-        account << obj.getTown();
-        account << ",";
-        account << obj.getState();
-        account << ",";
-        account << obj.getZipcode();
-        account << ",";
-        //Time formated in HH:MM:SS using setw to set width to 2 and fill 0 where needed
-        account << setw(2) << setfill('0') << (ptm->tm_hour+EST)%24 <<":" << setw(2) << setfill('0') << ptm->tm_min<<":" << setw(2) << setfill('0') << ptm->tm_sec;
-        account << ",";
-        account << setw(2) << setfill('0') << (ptm->tm_mon+1)%12 <<"/" << setw(2) << setfill('0') << ptm->tm_mday<<"/" << setw(4) << setfill('0') << ptm->tm_year+1900 ;
-        account << "\n";
-        cout<<"File created successfully."<<endl;
-        account.close();
-        continueExit();
     }
     else 
     {
@@ -182,59 +182,42 @@ int createAccount()
         else 
         {
             account << "Firstname,Lastname,Account#,Address,Town,State,Zipcode,Time(EST),Date"<<endl;
-            account << obj.getFirstName();
-            account << ",";
-            account << obj.getLastName();
-            account << ",";
-            account << generateAccountNumber();
-            account << ",";
-            account << obj.getHouseNumStreet();
-            account << ",";
-            account << obj.getTown();
-            account << ",";
-            account << obj.getState();
-            account << ",";
-            account << obj.getZipcode();
-            account << ",";
-            //Time formated in HH:MM:SS using setw to set width to 2 and fill 0 where needed
-            account << setw(2) << setfill('0') << (ptm->tm_hour+EST)%24 <<":" << setw(2) << setfill('0') << ptm->tm_min<<":" << setw(2) << setfill('0') << ptm->tm_sec;
-            account << ",";
-            account << setw(2) << setfill('0') << (ptm->tm_mon+1)%12 <<"/" << setw(2) << setfill('0') << ptm->tm_mday<<"/" << setw(4) << setfill('0') << ptm->tm_year+1900;
-            cout<<"File created successfully."<<endl;
-            account.close();
-            continueExit();
-        }
+        }   
     } 
+    account << obj.getFirstName();
+    account << ",";
+    account << obj.getLastName();
+    account << ",";
+    account << generateAccountNumber();
+    account << ",";
+    account << obj.getHouseNumStreet();
+    account << ",";
+    account << obj.getTown();
+    account << ",";
+    account << obj.getState();
+    account << ",";
+    account << obj.getZipcode();
+    account << ",";
+    //Time formated in HH:MM:SS using setw to set width to 2 and fill 0 where needed
+    account << setw(2) << setfill('0') << ((ptm->tm_hour+EST)%24+24)%24 <<":" << setw(2) << setfill('0') << ptm->tm_min<<":" << setw(2) << setfill('0') << ptm->tm_sec;
+    account << ",";
+    account << setw(2) << setfill('0') << (ptm->tm_mon+1)%12 <<"/" << setw(2) << setfill('0') << ptm->tm_mday<<"/" << setw(4) << setfill('0') << ptm->tm_year+1900 ;
+    account << "\n";
+    cout<<"File appended successfully."<<endl;
+    account.close();
+    continueExit();
    return 0;
 }
 
 int deleteAccount()
 {
-    Person obj;
-    account.open("account.csv", std::ios::out);
-     if(!account)
-   {
-       cout<<"Error in creating file!!!";
-       return 0;
-   }
-   account << "Firstname,Lastname,Account#,Address,Town,State,Zipcode,Time,Date"<<endl;
-   account << obj.getFirstName();
-   account << ",";
-   account << obj.getLastName();
-   account << ",";
-   account << generateAccountNumber();
-   account << ",";
-   account << obj.getHouseNumStreet();
-   account << ",";
-   account << obj.getTown();
-   account << ",";
-   account << obj.getState();
-   account << ",";
-   account << obj.getZipcode();
-   cout<<"File created successfully."<<endl;
-   account.close();
-   continueExit();
-   return 0;
+    account.open("account.csv");
+    string line = "";
+    while (getline(account,line)) {
+        stringstream accountData(line);
+        line = "";
+    }
+    return 0;
 }
 
 
