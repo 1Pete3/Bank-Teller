@@ -11,7 +11,7 @@
 #include <string>
 #include <ctime>
 #include <cctype>
-#define EST (-6)
+#define EST (-4)
 using namespace std;
 
 char test[5];
