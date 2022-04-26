@@ -10,8 +10,11 @@
 #include <random>
 #include <climits>
 #include <string>
+#include<sys/wait.h>
 #include <ctime>
 #include <cctype>
+#include <thread>
+#include <unistd.h>
 #define EST (-4)
 using namespace std;
 int NumberofAccounts=1;
@@ -174,7 +177,9 @@ int menu()
             } 
 
         Person* person = new Person();
-        accountNumbers.push_back(person->generateAccountNumber());
+        person->generateAccountNumber();
+        accountNumbers.push_back(person->accountNumber);
+        cout << person->accountNumber <<endl;
         account << person->accountNumber;
         account << ",";
         account << person->getFirstName();
@@ -199,6 +204,44 @@ int menu()
         cout << "\033[32mAccount created successfully\033[0m" << endl;
         delete person; 
         continueExit();
+    }
+    else if (menuSelection == 3) {
+        string depositAccountNum;
+        int depositOption;
+        cout << "Enter a bank account number: ";
+        cin >> depositAccountNum;
+        if(accountNumbers.empty()==true)
+        {
+            cout << "No accounts have been created yet" << endl;
+            cout << "heading back to the menu" << endl;
+            sleep(5);
+            menu();
+        }
+        else
+        {
+            for(int i=0;i<accountNumbers.size();i++)
+            {
+                if(depositAccountNum==std::to_string(accountNumbers[i]))
+                {
+                    cout << "Account found" << endl;
+                    cout << "Press 1 for cash deposit or 2 for check deposit: ";
+                    cin >> depositOption;
+                    if(depositOption == 1)
+                    {
+                        cout << "Cash deposit selected" << endl;
+                    }
+                    else if (depositOption == 2)
+                    {
+                        cout << "Cash deposit selected" << endl;
+                    }
+                }
+                else 
+                {
+                    cout << "Account not found try again" << endl;
+                }            
+            }
+        }
+        
     }
   return 0;
 }
