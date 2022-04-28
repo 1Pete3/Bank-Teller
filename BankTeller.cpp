@@ -169,6 +169,7 @@ float readAddFiles(string nameOfFile)
       }
     }
   }
+    errorlog.close();
     textFile.close();
     return temp;
 }
@@ -457,7 +458,91 @@ void widthdraw()
 }
 void applyFee()
 {
-    
+   int feeAccountNum;
+   float feeAmount; 
+   cout << "Enter a bank account number: ";
+   cin >> feeAccountNum;
+   if(accountChecker(feeAccountNum)==true)
+   {
+       //creates a directory called fees
+       if (mkdir("fees", 0777) == -1)
+        cerr << "Error: fees directory already exists"<< endl;
+
+    else
+        cout << "Directory created" << endl;
+   
+
+        char yesNo;
+        //directory/filename.txt
+        string fileName = "fees/"+encrypt(to_string(feeAccountNum))+"Fees.txt";
+        depositFile.open(fileName);
+        if (depositFile)
+        {
+        cout << "File "<< fileName << " exits, appending to it" << endl;
+        depositFile.close();
+        //Open for appending
+        depositFile.open(fileName, std::ios::app);
+        } 
+        else 
+        {
+            //create a new file if it doesn't exist
+            cout << "Creating file " << fileName << endl;
+            depositFile.open(fileName, std::ios::out);
+            //if the file fails to be created
+            if (!depositFile) 
+            {
+                cout << "Error in creating "<< fileName << endl;
+            }
+        }
+        cout << "Enter the fee amount: ";
+        cin >> feeAmount;
+        while (feeAmount < 0||feeAmount > 100000) 
+        {           
+            cin.clear ();    // Restore input stream to working state
+            cin.ignore ( 9 , '\n' );
+            cout << "Invalid input. Try again: ";
+            cin >> feeAmount;
+        }
+        depositFile << fixed<< setprecision(2)<<feeAmount<<endl;
+        cout << "Enter an other fee for this account?"<< endl;
+        cout << "Enter y for yes, n for no and return to the menu"<<endl;
+        cin >> yesNo;
+        while(yesNo == 'y')
+        {
+            cout << "Enter the fee amount: ";
+            cin >> feeAmount;
+            while (feeAmount < 0||feeAmount > 100000) 
+            {           
+                cin.clear ();    // Restore input stream to working state
+                cin.ignore ( 9, '\n' );
+                cout << "Invalid input. Try again: ";
+                cin >> feeAmount;
+            }
+            depositFile << fixed<< setprecision(2)<<feeAmount<<endl;
+            cout << "Enter an other fee for this account?"<< endl;
+            cout << "Enter y for yes, n for no and return to the menu"<<endl;
+            cin >> yesNo;
+        }
+        depositFile.close();
+        //read the values stored in the text file and add them all
+        readAddFiles("fees/"+encrypt(to_string(feeAccountNum))+"Fees.txt");
+        //store the total fee value in a map with the key value being the feeAccountNum
+        map <unsigned int, float> feeMap;
+        std::map<unsigned int, float>::iterator it;
+        //if key doesn't exist add the key and element
+        if(feeMap.find(feeAccountNum)==feeMap.end())
+        {
+            feeMap.emplace(feeAccountNum,readAddFiles("fees/"+encrypt(to_string(feeAccountNum))+"Fees.txt"));
+        }
+        //if the key already exists, erase the contents and add the newest value
+        else
+        {
+          
+          
+        }
+        cout << "map value: "<<feeMap.at(feeAccountNum)<<endl;
+        menu();
+    } 
 }
 
 int menu() {
@@ -502,6 +587,15 @@ int menu() {
   {
     applyFee();
   } 
+  else if (menuSelection == 6) 
+  {
+    //checkBalance();
+  } 
+  else
+  {
+    exit(0);
+  }
+
   return 0;
 
 }
@@ -554,6 +648,7 @@ int main(int argc, char ** argv) {
       }
     }
     textFile.close();
+    errorlog.close();
   }
   
   // selects type of transaction
