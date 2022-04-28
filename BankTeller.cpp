@@ -1,6 +1,9 @@
 #include<bits/stdc++.h>
 #include <cctype>
+#include <cfloat>
 #include <cstdio>
+#include <cstring>
+#include <ios>
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -10,23 +13,26 @@
 #include <random>
 #include <climits>
 #include <string>
+
 #include<sys/wait.h>
 #include <ctime>
 #include <cctype>
+#include <vector> 
 #include <thread>
 #include <unistd.h>
 #define EST (-4)
 using namespace std;
 int NumberofAccounts=1;
 int userInput;
-int key = 10;
+int key = 20;
 fstream account;
 fstream textFile;
+fstream depositFile;
 fstream errorlog;
 void continueExit();
 int menu();
 void checkInputSize(char* input,int size );
-vector< unsigned int> accountNumbers;
+vector< int> accountNumbers;
 time_t rawtime;
 struct tm * ptm;
 
@@ -133,26 +139,38 @@ void checkInputSize(char * input, int size) {
 }
 void createAccount()
 {
+    //Writes account numbers to a txt file 
     textFile.open("accounts.txt");
-    if (textFile) {
+    if (textFile)
+    {
       cout << "File accounts.txt exits, appending to it" << endl;
       textFile.close();
+      //Open for appending
       textFile.open("accounts.txt", std::ios::app);
-    } else {
+    } 
+    else 
+    {
+      //create a new file if it doesn't exist
       cout << "Creating file accounts.txt" << endl;
       textFile.open("accounts.txt", std::ios::out);
-      if (!textFile) {
+      //if the file fails to be created
+      if (!textFile) 
+      {
         cout << "Error in creating file!!!";
       }
     }
+    //Writes account numbers to a csv file 
     account.open("account.csv");
     if (account) {
       cout << "File account.csv exits, appending to it" << endl;
       account.close();
+      //Open for appending
       account.open("account.csv", std::ios::app);
     } else {
+      //create a new file if it doesn't exist
       cout << "Creating file account.csv" << endl;
       account.open("account.csv", std::ios::out);
+      //if the file fails to be created
       if (!account) {
         cout << "Error in creating file!!!";
       } else {
@@ -185,9 +203,99 @@ void createAccount()
     account << setw(2) << setfill('0') << (ptm -> tm_mon + 1) % 12 << "/" << setw(2) << setfill('0') << ptm -> tm_mday << "/" << setw(4) << setfill('0') << ptm -> tm_year + 1900;
     account << "\n";
     account.close();
-    cout << NumberofAccounts++;
     cout << "\033[32mAccount created successfully\033[0m" << endl;
     delete person;
+    
+}
+
+bool accountChecker(int checkAccountNumber)
+{
+    vector<int>::iterator it;
+    it = find(accountNumbers.begin(), accountNumbers.end(), checkAccountNumber);
+    
+    if (it != accountNumbers.end())
+    {
+        cout << "Account found" << endl;
+        return true;
+    }
+    else
+    {
+        cout << "No accounts found"<< endl;
+        cout << "Returning to menu"<< endl;
+        sleep(5);
+        menu();
+        return false;
+    }
+
+}
+
+void deposit()
+{
+   int depositAccountNum;
+   float depositAmount; 
+   cout << "Enter a bank account number: ";
+   cin >> depositAccountNum;
+   if(accountChecker(depositAccountNum)==true)
+   {
+        char yesNo;
+        string fileName = encrypt(to_string(depositAccountNum))+".txt";
+        //Writes account numbers to a txt file 
+        depositFile.open(fileName);
+        if (depositFile)
+        {
+        cout << "File accounts.txt exits, appending to it" << endl;
+        depositFile.close();
+        //Open for appending
+        depositFile.open(fileName, std::ios::app);
+        } 
+        else 
+        {
+            //create a new file if it doesn't exist
+            cout << "Creating file " << fileName << endl;
+            depositFile.open(fileName, std::ios::out);
+            //if the file fails to be created
+            if (!depositFile) 
+            {
+                cout << "Error in creating "<< fileName << endl;
+            }
+        }
+        cout << "Enter the deposit amount: ";
+        cin >> depositAmount;
+        while (depositAmount < 0||depositAmount > 50) 
+        {           
+            cin.clear ();    // Restore input stream to working state
+            cin.ignore ( 11 , '\n' );
+            cout << "Invalid input. Try again: ";
+            cin >> depositAmount;
+        }
+        depositFile << fixed<< setprecision(2)<<depositAmount<<endl;
+        cout << "Enter an other deposit for this account?"<< endl;
+        cout << "Enter y for yes, n for no and return to the menu"<<endl;
+        cin >> yesNo;
+        while(yesNo == 'y')
+        {
+            cout << "Enter the deposit amount: ";
+            cin >> depositAmount;
+            while (depositAmount < 0||depositAmount > 50) 
+            {           
+                cin.clear ();    // Restore input stream to working state
+                cin.ignore ( 11 , '\n' );
+                cout << "Invalid input. Try again: ";
+                cin >> depositAmount;
+            }
+            depositFile << fixed<< setprecision(2)<<depositAmount<<endl;
+            cout << "Enter an other deposit for this account?"<< endl;
+            cout << "Enter y for yes, n for no and return to the menu"<<endl;
+            cin >> yesNo;
+        }
+        menu();
+      
+       
+    }
+}
+void widthdraw()
+{
+
 }
 
 int menu() {
@@ -207,24 +315,27 @@ int menu() {
   cout << "Enter a menu item number: ";
   cin >> menuSelection;
 
-  if (menuSelection == 1) {
+  if (menuSelection == 1) 
+  {
     createAccount();
     continueExit();
-    
-  } else if (menuSelection == 3) {
-    string depositAccountNum;
-    int depositOption;
-    cout << "Enter a bank account number: ";
-    cin >> depositAccountNum;
-
-    
-           
-  } else if (menuSelection == 2) {
-    for (int i = 0; i < accountNumbers.size(); i++) {
-      cout << "accountNumbers[" << i << "]" << " " << accountNumbers[i] << endl;
+  } 
+  else if (menuSelection == 2) 
+  {
+    for (int i = 0; i < accountNumbers.size(); i++)
+    {
+        cout << "accountNumbers[" << i << "]" << " " << accountNumbers[i] << endl;
     }
     continueExit();
   }
+  else if (menuSelection == 3) 
+  {
+    deposit();
+  } 
+  else if (menuSelection == 4) 
+  {
+    widthdraw();
+  } 
   return 0;
 
 }
