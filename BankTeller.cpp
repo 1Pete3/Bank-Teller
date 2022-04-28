@@ -13,8 +13,9 @@
 #include <random>
 #include <climits>
 #include <string>
-
 #include<sys/wait.h>
+#include <sys/stat.h>
+#include <errno.h>
 #include <ctime>
 #include <cctype>
 #include <vector> 
@@ -237,13 +238,22 @@ void deposit()
    cin >> depositAccountNum;
    if(accountChecker(depositAccountNum)==true)
    {
+       //creates a directory called deposits
+       if (mkdir("deposits", 0777) == -1)
+        cerr << "Error: deposits directory already exists"<< endl;
+
+    else
+        cout << "Directory created" << endl;
+   
+
         char yesNo;
-        string fileName = encrypt(to_string(depositAccountNum))+".txt";
+        //directory/filename.txt
+        string fileName = "deposits/"+encrypt(to_string(depositAccountNum))+"Deposit.txt";
         //Writes account numbers to a txt file 
         depositFile.open(fileName);
         if (depositFile)
         {
-        cout << "File accounts.txt exits, appending to it" << endl;
+        cout << "File "<< fileName << " exits, appending to it" << endl;
         depositFile.close();
         //Open for appending
         depositFile.open(fileName, std::ios::app);
@@ -261,10 +271,10 @@ void deposit()
         }
         cout << "Enter the deposit amount: ";
         cin >> depositAmount;
-        while (depositAmount < 0||depositAmount > 50) 
+        while (depositAmount < 0||depositAmount > 100000) 
         {           
             cin.clear ();    // Restore input stream to working state
-            cin.ignore ( 11 , '\n' );
+            cin.ignore ( 9 , '\n' );
             cout << "Invalid input. Try again: ";
             cin >> depositAmount;
         }
@@ -276,10 +286,10 @@ void deposit()
         {
             cout << "Enter the deposit amount: ";
             cin >> depositAmount;
-            while (depositAmount < 0||depositAmount > 50) 
+            while (depositAmount < 0||depositAmount > 100000) 
             {           
                 cin.clear ();    // Restore input stream to working state
-                cin.ignore ( 11 , '\n' );
+                cin.ignore ( 9, '\n' );
                 cout << "Invalid input. Try again: ";
                 cin >> depositAmount;
             }
@@ -288,14 +298,85 @@ void deposit()
             cout << "Enter y for yes, n for no and return to the menu"<<endl;
             cin >> yesNo;
         }
+        depositFile.close();
         menu();
-      
-       
     }
 }
 void widthdraw()
 {
+    int widthdrawAccountNum;
+   float widthdrawAmount; 
+   cout << "Enter a bank account number: ";
+   cin >> widthdrawAccountNum;
+   if(accountChecker(widthdrawAccountNum)==true)
+   {
+       //creates a directory called deposits
+       if (mkdir("widthdraws", 0777) == -1)
+        cerr << "Error: widthdraws directory already exists"<< endl;
 
+    else
+        cout << "Directory created" << endl;
+   
+
+        char yesNo;
+        //directory/filename.txt
+        string fileName = "widthdraws/"+encrypt(to_string(widthdrawAccountNum))+"Widthdraw.txt";
+        //Writes account numbers to a txt file 
+        depositFile.open(fileName);
+        if (depositFile)
+        {
+        cout << "File "<< fileName << " exits, appending to it" << endl;
+        depositFile.close();
+        //Open for appending
+        depositFile.open(fileName, std::ios::app);
+        } 
+        else 
+        {
+            //create a new file if it doesn't exist
+            cout << "Creating file " << fileName << endl;
+            depositFile.open(fileName, std::ios::out);
+            //if the file fails to be created
+            if (!depositFile) 
+            {
+                cout << "Error in creating "<< fileName << endl;
+            }
+        }
+        cout << "Enter the widthdraw amount: ";
+        cin >> widthdrawAmount;
+        while (widthdrawAmount < 0||widthdrawAmount > 100000) 
+        {           
+            cin.clear ();    // Restore input stream to working state
+            cin.ignore ( 9 , '\n' );
+            cout << "Invalid input. Try again: ";
+            cin >> widthdrawAmount;
+        }
+        depositFile << fixed<< setprecision(2)<<widthdrawAmount<<endl;
+        cout << "Enter an other widthdraw for this account?"<< endl;
+        cout << "Enter y for yes, n for no and return to the menu"<<endl;
+        cin >> yesNo;
+        while(yesNo == 'y')
+        {
+            cout << "Enter the widthdraw amount: ";
+            cin >> widthdrawAmount;
+            while (widthdrawAmount < 0||widthdrawAmount > 100000) 
+            {           
+                cin.clear ();    // Restore input stream to working state
+                cin.ignore ( 9, '\n' );
+                cout << "Invalid input. Try again: ";
+                cin >> widthdrawAmount;
+            }
+            depositFile << fixed<< setprecision(2)<<widthdrawAmount<<endl;
+            cout << "Enter an other widthdraw for this account?"<< endl;
+            cout << "Enter y for yes, n for no and return to the menu"<<endl;
+            cin >> yesNo;
+        }
+        depositFile.close();
+        menu();
+    }
+}
+void applyFee()
+{
+    
 }
 
 int menu() {
@@ -307,8 +388,8 @@ int menu() {
   cout << "| 2.Show accounts" << "             |" << endl;
   cout << "| 3.Deposit" << "                   |" << endl;
   cout << "| 4.Widthdraw" << "                 |" << endl;
-  cout << "| 5.Check balance" << "             |" << endl;
-  cout << "| 6.Apply fee" << "                 |" << endl;
+  cout << "| 5.Apply fee" << "             |" << endl;
+  cout << "| 6.Check balance" << "                 |" << endl;
   cout << "| 7.Exit" << "                      |" << endl;
   cout << "===============================" << endl;
 
@@ -335,6 +416,10 @@ int menu() {
   else if (menuSelection == 4) 
   {
     widthdraw();
+  } 
+  else if (menuSelection == 5) 
+  {
+    applyFee();
   } 
   return 0;
 
