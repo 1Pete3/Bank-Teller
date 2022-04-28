@@ -17,6 +17,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <ctime>
+#include <unordered_map>
 #include <cctype>
 #include <vector> 
 #include <thread>
@@ -130,6 +131,48 @@ string decrypt(string decryptedText)
     return decryptedText;
 }
 
+float readAddFiles(string nameOfFile)
+{
+  time( & rawtime);
+  ptm = gmtime( & rawtime);
+  string tmp;
+  float temp = 0;
+  textFile.open(nameOfFile,ios::in);
+  if (!textFile) 
+  {
+    cout<<nameOfFile<<endl;
+    cout << "No such file"<<endl;
+  } 
+  else 
+  {
+      while (getline(textFile, tmp, '\n')) {
+      try {        
+        float money = stof(tmp);
+        temp = money + temp;
+        cout <<"temp is " << temp <<endl;
+      } catch (std::exception & e) {
+        if (errorlog) {
+          cout << "\033[93;100mFile errorlog.txt exits, appending to it\033[0m" << endl;
+          errorlog.close();
+          errorlog.open("errorlog.txt", std::ios::app);
+        } else {
+          cout << "Creating file errorlog.txt" << endl;
+          errorlog.open("errorlog.txt", std::ios::out);
+          if (!errorlog) {
+            cout << "Error in creating file!!!";
+            return 0;
+          }
+        }
+        errorlog << setw(2) << setfill('0') << (ptm -> tm_mon + 1) % 12 << "/" << setw(2) << setfill('0') << ptm -> tm_mday << "/" << setw(4) << setfill('0') << ptm -> tm_year + 1900 << " " <<
+          setw(2) << setfill('0') << ((ptm -> tm_hour + EST) % 24 + 24) % 24 << ":" << setw(2) << setfill('0') << ptm -> tm_min << ":" << setw(2) << setfill('0') << ptm -> tm_sec << " " <<
+          e.what() << "(" << tmp << ")" << " caused this error\n";
+      }
+    }
+  }
+    textFile.close();
+    return temp;
+}
+
 // Checks for buffer over flow 
 void checkInputSize(char * input, int size) {
   while (strlen(input) >= size) {
@@ -232,6 +275,7 @@ bool accountChecker(int checkAccountNumber)
 
 void deposit()
 {
+   bool keyExists = false;
    int depositAccountNum;
    float depositAmount; 
    cout << "Enter a bank account number: ";
@@ -299,11 +343,30 @@ void deposit()
             cin >> yesNo;
         }
         depositFile.close();
+        //read the values stored in the text file and add them all
+        readAddFiles("deposits/"+encrypt(to_string(depositAccountNum))+"Deposit.txt");
+        //store the total deposit value in a map with the key value being the depositAccountNum
+        map <unsigned int, float> depositMap;
+        std::map<unsigned int, float>::iterator it;
+        //if key doesn't exist add the key and element
+        if(depositMap.find(depositAccountNum)==depositMap.end())
+        {
+            keyExists = false;
+            depositMap.emplace(depositAccountNum,readAddFiles("deposits/"+encrypt(to_string(depositAccountNum))+"Deposit.txt"));
+        }
+        //if the key already exists, erase the contents and add the newest value
+        else
+        {
+          keyExists = true;  
+          cout << keyExists << endl;
+        }
+        cout << "map value: "<<depositMap.at(depositAccountNum)<<endl;
         menu();
     }
 }
 void widthdraw()
 {
+    bool keyExists;
     int widthdrawAccountNum;
    float widthdrawAmount; 
    cout << "Enter a bank account number: ";
@@ -371,6 +434,24 @@ void widthdraw()
             cin >> yesNo;
         }
         depositFile.close();
+        //read the values stored in the text file and add them
+        readAddFiles("widthdraws/"+encrypt(to_string(widthdrawAccountNum))+"Widthdraw.txt");      
+        //store the total widthdraw value in a map with the key value being the depositAccountNum
+        map <unsigned int, float> widthdrawMap;
+        std::map<unsigned int, float>::iterator it;
+        //if key doesn't exist add the key and element
+        if(widthdrawMap.find(widthdrawAccountNum)==widthdrawMap.end())
+        {
+            keyExists = false;
+            widthdrawMap.emplace(widthdrawAccountNum,readAddFiles("widthdraws/"+encrypt(to_string(widthdrawAccountNum))+"Widthdraw.txt"));
+        }
+        //if the key already exists, erase the contents and add the newest value
+        else
+        {
+          keyExists = true;  
+          cout << keyExists << endl;
+        }
+        cout << "map value: "<<widthdrawMap.at(widthdrawAccountNum)<<endl;  
         menu();
     }
 }
@@ -443,7 +524,7 @@ int main(int argc, char ** argv) {
   time( & rawtime);
   ptm = gmtime( & rawtime);
    string tmp;
-  textFile.open("accounts.txt", ios:: in );
+  textFile.open("accounts.txt", ios::in );
   if (!textFile) {
     cout << "No such file";
   } else {
