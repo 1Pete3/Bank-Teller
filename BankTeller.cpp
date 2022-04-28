@@ -34,9 +34,12 @@ fstream errorlog;
 void continueExit();
 int menu();
 void checkInputSize(char* input,int size );
-vector< int> accountNumbers;
+vector<int> accountNumbers;
 time_t rawtime;
 struct tm * ptm;
+map <unsigned int, float> depositMap;
+map <unsigned int, float> widthdrawMap;
+map <unsigned int, float> feeMap;
 
 class Person {
   private:
@@ -289,8 +292,6 @@ void deposit()
 
     else
         cout << "Directory created" << endl;
-   
-
         char yesNo;
         //directory/filename.txt
         string fileName = "deposits/"+encrypt(to_string(depositAccountNum))+"Deposit.txt";
@@ -347,7 +348,7 @@ void deposit()
         //read the values stored in the text file and add them all
         readAddFiles("deposits/"+encrypt(to_string(depositAccountNum))+"Deposit.txt");
         //store the total deposit value in a map with the key value being the depositAccountNum
-        map <unsigned int, float> depositMap;
+        
         std::map<unsigned int, float>::iterator it;
         //if key doesn't exist add the key and element
         if(depositMap.find(depositAccountNum)==depositMap.end())
@@ -370,18 +371,64 @@ void widthdraw()
     bool keyExists;
     int widthdrawAccountNum;
    float widthdrawAmount; 
+   string tmp;
+   float temp;
    cout << "Enter a bank account number: ";
    cin >> widthdrawAccountNum;
    if(accountChecker(widthdrawAccountNum)==true)
    {
+       textFile.open("deposits/"+encrypt(to_string(widthdrawAccountNum))+"Deposit.txt", ios::in); 
+        if (!textFile) 
+        {
+            cout << "No deposits have been made for that account"<<endl;
+            exit(0);            
+            
+        } 
+        else 
+        {
+            while (getline(textFile, tmp, '\n'))
+            {
+                try 
+                {
+                    float money = stof(tmp);
+                    temp = money + temp;
+                    cout <<"temp is " << temp <<endl;        
+                }
+                catch (std::exception & e) 
+                {
+                    if (errorlog) 
+                    {
+                        cout << "\033[93;100mFile errorlog.txt exits, appending to it\033[0m" << endl;
+                        errorlog.close();
+                        errorlog.open("errorlog.txt", std::ios::app);
+                    }
+                    else
+                    {
+                        cout << "Creating file errorlog.txt" << endl;
+                        errorlog.open("errorlog.txt", std::ios::out);
+                        if (!errorlog) 
+                        {
+                            cout << "Error in creating file!!!";
+                        }
+                    }
+                    errorlog << setw(2) << setfill('0') << (ptm -> tm_mon + 1) % 12 << "/" << setw(2) << setfill('0') << ptm -> tm_mday << "/" << setw(4) << setfill('0') << ptm -> tm_year + 1900 << " " <<
+                    setw(2) << setfill('0') << ((ptm -> tm_hour + EST) % 24 + 24) % 24 << ":" << setw(2) << setfill('0') << ptm -> tm_min << ":" << setw(2) << setfill('0') << ptm -> tm_sec << " " <<
+                    e.what() << "(" << tmp << ")" << " caused this error\n";
+                }
+            }
+        textFile.close();
+        errorlog.close(); 
+        depositMap.emplace(widthdrawAccountNum,temp);           
+        }
+
+
+       cout << "TEST"<< depositMap.at(widthdrawAccountNum)<<endl;
        //creates a directory called deposits
        if (mkdir("widthdraws", 0777) == -1)
         cerr << "Error: widthdraws directory already exists"<< endl;
 
     else
         cout << "Directory created" << endl;
-   
-
         char yesNo;
         //directory/filename.txt
         string fileName = "widthdraws/"+encrypt(to_string(widthdrawAccountNum))+"Widthdraw.txt";
@@ -407,7 +454,8 @@ void widthdraw()
         }
         cout << "Enter the widthdraw amount: ";
         cin >> widthdrawAmount;
-        while (widthdrawAmount < 0||widthdrawAmount > 100000) 
+        float testnum = depositMap.at(widthdrawAccountNum);
+        while (widthdrawAmount > temp)
         {           
             cin.clear ();    // Restore input stream to working state
             cin.ignore ( 9 , '\n' );
@@ -415,30 +463,11 @@ void widthdraw()
             cin >> widthdrawAmount;
         }
         depositFile << fixed<< setprecision(2)<<widthdrawAmount<<endl;
-        cout << "Enter an other widthdraw for this account?"<< endl;
-        cout << "Enter y for yes, n for no and return to the menu"<<endl;
-        cin >> yesNo;
-        while(yesNo == 'y')
-        {
-            cout << "Enter the widthdraw amount: ";
-            cin >> widthdrawAmount;
-            while (widthdrawAmount < 0||widthdrawAmount > 100000) 
-            {           
-                cin.clear ();    // Restore input stream to working state
-                cin.ignore ( 9, '\n' );
-                cout << "Invalid input. Try again: ";
-                cin >> widthdrawAmount;
-            }
-            depositFile << fixed<< setprecision(2)<<widthdrawAmount<<endl;
-            cout << "Enter an other widthdraw for this account?"<< endl;
-            cout << "Enter y for yes, n for no and return to the menu"<<endl;
-            cin >> yesNo;
-        }
         depositFile.close();
         //read the values stored in the text file and add them
         readAddFiles("widthdraws/"+encrypt(to_string(widthdrawAccountNum))+"Widthdraw.txt");      
         //store the total widthdraw value in a map with the key value being the depositAccountNum
-        map <unsigned int, float> widthdrawMap;
+        
         std::map<unsigned int, float>::iterator it;
         //if key doesn't exist add the key and element
         if(widthdrawMap.find(widthdrawAccountNum)==widthdrawMap.end())
@@ -527,7 +556,6 @@ void applyFee()
         //read the values stored in the text file and add them all
         readAddFiles("fees/"+encrypt(to_string(feeAccountNum))+"Fees.txt");
         //store the total fee value in a map with the key value being the feeAccountNum
-        map <unsigned int, float> feeMap;
         std::map<unsigned int, float>::iterator it;
         //if key doesn't exist add the key and element
         if(feeMap.find(feeAccountNum)==feeMap.end())
@@ -545,6 +573,20 @@ void applyFee()
     } 
 }
 
+float checkBalance(int accountNum)
+{
+    float balance,x,y,z;
+    x = depositMap.at(accountNum);
+    y = widthdrawMap.at(accountNum);
+    z = feeMap.at(accountNum);
+    cout<<x<<endl;
+    cout<<y<<endl;
+    cout<<z<<endl;
+    balance = depositMap.at(accountNum)-widthdrawMap.at(accountNum)-feeMap.at(accountNum);
+    cout << balance<<endl;
+    return 0;
+}
+
 int menu() {
   int menuSelection;
   cout << "|=============================|" << endl;
@@ -554,8 +596,8 @@ int menu() {
   cout << "| 2.Show accounts" << "             |" << endl;
   cout << "| 3.Deposit" << "                   |" << endl;
   cout << "| 4.Widthdraw" << "                 |" << endl;
-  cout << "| 5.Apply fee" << "             |" << endl;
-  cout << "| 6.Check balance" << "                 |" << endl;
+  cout << "| 5.Apply fee" << "                 |" << endl;
+  cout << "| 6.Check balance" << "             |" << endl;
   cout << "| 7.Exit" << "                      |" << endl;
   cout << "===============================" << endl;
 
@@ -589,7 +631,9 @@ int menu() {
   } 
   else if (menuSelection == 6) 
   {
-    //checkBalance();
+    int checkAccountBalance;
+    cin >> checkAccountBalance;
+    checkBalance(checkAccountBalance);
   } 
   else
   {
