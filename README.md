@@ -41,13 +41,13 @@ When using the menu, the program will prompt the user to enter a number 1 -7 to 
 *	A withdraws directory will be automatically created if there is not one already
 *	A text file associated with that account will be created in that directory with a name like  EEGEFLIHJDWithdraw.txt if the file does not already exist. If it exists then the new information will be appended.
 
-##Apply Fee
+## Apply Fee
 *	Allows the user to apply fees for a valid bank account
 *	User must enter a bank account before entering details of the fee
 *	A fees directory will be automatically created if there is not one already
 * A text file associated with that account will be created in that directory with a name like  EEGEFLIHJDFees.txt if the file does not already exist. If it exists then the new information will be appended.
 
-##Check Balance
+## Check Balance
 * Allows the user to check the balance for a valid bank account
 *	Check balance uses the text files from withdraws, deposits, and fees to calculate the balance of a bank account
 *	Positive balances are green and negative balances are red
