@@ -54,3 +54,6 @@ When using the menu, the program will prompt the user to enter a number 1 -7 to 
 *	Balance = deposits – withdraws - fees
 
 ![image](https://user-images.githubusercontent.com/75858369/166078847-b3514949-95f9-4ace-8359-40fa7179acf4.png)
+
+##Exit
+* User can enter 7 to exit the program
