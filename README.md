@@ -1,2 +1,2 @@
-# CS455-Project
+# Bank Teller
 Bank teller program in C++
