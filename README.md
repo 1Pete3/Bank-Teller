@@ -15,3 +15,10 @@ This program was created to represent the transaction that a bank teller may enc
 When using the menu, the program will prompt the user to enter a number 1 -7 to access the contents of the menu. For the deposit, withdraw, apply fee and check balance functions, the user is required to enter a valid bank account number else they will be returned to the main menu. To view an account the user can enter 2 to show all the accounts and right-click and copy/paste to make it easier. 
 
 ![image](https://user-images.githubusercontent.com/75858369/166078505-9e03889a-2e56-42ad-a78a-6aca03e4f77d.png)
+
+## Create Account
+*	User enters 1 on the menu
+*	Program checks if accounts.txt and accounts.csv exist
+*	accounts.txt is read by the program and stores existing created accounts in a vector and adds new ones if they are created.
+*	accounts.csv stores information associated with the account like the first name, last name, house number and street address, state, zip code which can be opened in Excel or other software for more convenient viewing
+*	If accounts.txt and account.csv are not created the program automatically creates them 
