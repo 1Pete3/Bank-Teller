@@ -19,6 +19,7 @@
 #include <ctime>
 #include <vector> 
 #include <thread>
+#include <regex>
 #include <unistd.h>
 #define EST (-4)
 using namespace std;
@@ -30,6 +31,7 @@ fstream textFile;
 fstream depositFile;
 fstream errorlog;
 void continueExit();
+bool isValidString(string text);
 int menu();
 void checkInputSize(char* input,int size );
 vector<int> accountNumbers;
@@ -40,9 +42,7 @@ bool loggedIn = false;
 //Person class was used to create bank accounts with personal information
 class Person {
   private:
-    const static int size = 21;
-  char fName[size], lName[size], state[3], zipcode[6];
-  string houseNumStreetName, town;
+  string houseNumStreetName, town,fName, lName, state, zipcode;
   public:
     unsigned int accountNumber;
   Person() {}
@@ -78,14 +78,28 @@ class Person {
   string getFirstName() {
     cout << "Enter the customers first name: ";
     cin >> fName;
-    checkInputSize(fName, size);
+    while (fName.length()>20 ||(isValidString(fName)==false))
+    {           
+        cin.clear ();    // Restore input stream to working state
+        cin.ignore ( 9, '\n' );
+        cout << "Invalid Input. Try again: ";
+        cin >> fName;
+        isValidString(fName);
+    }
     return fName;
   }
- // Function to get someones first name 
+ // Function to get someones last name 
   string getLastName() {
     cout << "Enter the customers last name: ";
     cin >> lName;
-    checkInputSize(fName, size);
+    while (lName.length()>20 ||(isValidString(lName)==false))
+    {           
+        cin.clear ();    // Restore input stream to working state
+        cin.ignore ( 9, '\n' );
+        cout << "Invalid Input. Try again: ";
+        cin >> lName;
+        isValidString(lName);
+    }
     return lName;
   }
   // Function to get someones address, getline was used here because of space between house num, street name
@@ -106,33 +120,60 @@ class Person {
   string getState() {
     cout << "Enter the state (2 letter abbrivation): ";
     cin >> state;
-    checkInputSize(state, 3);
-    // Capitalizes the state entered
-    for (int i = 0; i < strlen(state); i++) {
-      state[i] = toupper(state[i]);
+    while (state.length()>2 ||(isValidString(state)==false))
+    {           
+        cin.clear ();    // Restore input stream to working state
+        cin.ignore ( 9, '\n' );
+        cout << "Invalid Input. Try again: ";
+        cin >> state;
+        isValidString(state);
     }
+    // Capitalizes the state entered
+    for (int i = 0; i < state.length(); i++) {
+      state[i] = toupper(state[i]);
+    }    
     return state;
   }
   // Function to get someones zipcode
   string getZipcode() {
+    int count;
     cout << "Enter the zipcode: ";
     cin >> zipcode;
-    checkInputSize(zipcode, 6);
+    while (zipcode.length()!= 5)
+    {           
+        cin.clear ();    // Restore input stream to working state
+        cin.ignore ( 9, '\n' );
+        cout << "Invalid Input. Try again: ";
+        cin >> state;
+    }
     return zipcode;
   }
 };
 
+bool isValidString(string str)
+{
+	regex regx("[@,_!#$%^&*()<>?/|}{~:]");
+	if(regex_search(str, regx) == 0)
+    {
+        return true;
+    }
+	else
+    {
+        return false;
+    }
+}
+
+
 // Function for logging into the program since this is sensitive information
 void login()
 {
-    
     char password[9];
     int count = 0;    
     printf("Enter password: ");
 //1-1
 // Used fgets here so that array bound is checked and so that buffer overflow is prevented     
     fgets(password,9,stdin);
-        if(strcmp(password,"S8^qFWX+")==0)
+        if(strcmp(password,"password")==0)
         {
             loggedIn = true;
         }
@@ -205,15 +246,6 @@ float readAddFiles(string nameOfFile)
     errorlog.close();
     textFile.close();
     return temp;
-}
-
-// Checks for buffer over flow 
-void checkInputSize(char * input, int size) {
-  while (strlen(input) >= size) {
-    cout << "\033[31;103mInput is greater than " << size - 1 << " characters try again!\033[0m" << endl;
-    cin >> input;
-  }
-
 }
 // Function used to create accounts and write info to a csv and txt file
 void createAccount()
@@ -502,8 +534,6 @@ void applyFee()
 
     else
         cout << "Directory created" << endl;
-   
-
         char yesNo;
         //directory/filename.txt
         string fileName = "fees/"+encrypt(to_string(feeAccountNum))+"Fees.txt";
@@ -668,13 +698,12 @@ void continueExit() {
 }
 
 //command line arguments for bank transactions
-// *Command Injection* can occur here if the user adds ; after deposit or any other transaction
 int main(int argc, char ** argv) {
     // While function is used here so that user needs to enter the correct password or they can't get in
-    /*while(loggedIn==false)
+    while(loggedIn==false)
     {
         login();
-    }*/
+    }
   time( & rawtime);
   ptm = gmtime( & rawtime);
    string tmp;
@@ -733,9 +762,15 @@ int main(int argc, char ** argv) {
     cout << "Widthdraw Selected" << endl;
     widthdraw();
 
-  } else if (argc == 3 && strcmp(argv[1], "fee") == 0) {
+  } else if (argc == 2 && strcmp(argv[1], "fee") == 0) 
+  {
     applyFee();
-  } else if (argc == 2 && strcmp(argv[1], "menu") == 0) {
+  } 
+  else if (argc == 2 && strcmp(argv[1], "balance") == 0) 
+  {
+    checkBalance();
+  } 
+  else if (argc == 2 && strcmp(argv[1], "menu") == 0) {
     menu();
   } else {
     cout << "\033[36mUse ./a.out create to create a new bank account" << endl;
