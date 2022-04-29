@@ -11,3 +11,5 @@ This program was created to represent the transaction that a bank teller may enc
 * 	**./a.out balance** - for a balance inquiry
 * 	**./a.out menu** - to access the menu
 * 	**./a.out** – to see all available command-line arguments
+
+When using the menu, the program will prompt the user to enter a number 1 -7 to access the contents of the menu. For the deposit, withdraw, apply fee and check balance functions, the user is required to enter a valid bank account number else they will be returned to the main menu. To view an account the user can enter 2 to show all the accounts and right-click and copy/paste to make it easier. 
