@@ -50,6 +50,7 @@ class Person {
     ~Person() {}
 
   // Cryptographically random numbers from the inclass example, used to generate account numbers 
+  // 7-1 new account numbers are generated everytime an account is created, account numbers are checked so that they are not the same
   unsigned int generateAccountNumber() {
     random_device r;
     seed_seq seed {
@@ -76,8 +77,11 @@ class Person {
   }
   // Function to get someones first name
   string getFirstName() {
+    
     cout << "Enter the customers first name: ";
     cin >> fName;
+    //6-1 does not let the user enter a first name over 20 characters and checks if there are any special characters being used
+    //using a while loop the program will continue getting input from the user until they enter a valid value
     while (fName.length()>20 ||(isValidString(fName)==false))
     {           
         cin.clear ();    // Restore input stream to working state
@@ -134,25 +138,48 @@ class Person {
     }    
     return state;
   }
+  //zipcode.length() != 5
+    bool isFiveDigits(string zipcode)
+    {
+        int count;
+    for (int i =0; i < zipcode.length();i++)
+        {
+            if(isdigit(zipcode[i])==true)
+            {
+                count++;
+            }
+        }
+        if (count == 5)
+        {
+            return true; 
+        }
+        else
+        {
+            count = 0;
+            return false;
+        }
+    }
+
   // Function to get someones zipcode
   string getZipcode() {
     int count;
     cout << "Enter the zipcode: ";
     cin >> zipcode;
-    while (zipcode.length()!= 5)
+    while (isFiveDigits(zipcode)==false)
     {           
         cin.clear ();    // Restore input stream to working state
         cin.ignore ( 9, '\n' );
         cout << "Invalid Input. Try again: ";
-        cin >> state;
+        cin >> zipcode;
     }
     return zipcode;
   }
 };
 
+//5-1 some data sanitization to prevent user from using some special characters when recieving input
 bool isValidString(string str)
 {
-	regex regx("[@,_!#$%^&*()<>?/|}{~:]");
+	regex regx("[@,_!#$%^&*()<>?/|}{~:;]");
 	if(regex_search(str, regx) == 0)
     {
         return true;
@@ -179,8 +206,7 @@ void login()
         }
     
 }
-// Function for encryting a string, the account numbers are encrypted when writing to a file
-// Protects stored data and prevents information leakages
+//7-2 Function for encryting a string, the account numbers are encrypted when writing to a file. The acual account number is not store in files
 string encrypt(string encryptedText)
 {
     for(int i=0; (i<75 && encryptedText[i]!='\0'); i++)
@@ -224,9 +250,11 @@ float readAddFiles(string nameOfFile)
         temp = money + temp;
         //cout <<"temp is " << temp <<endl;
       } catch (std::exception & e) {
+        //6-2 when creating a file, if the file already exists open it in append mode rather than over writting all the contents
+        // If the errorlog file doesn't exist then create a file named errorlog.txt that allows output        
         if (errorlog) {
           cout << "\033[93;100mFile errorlog.txt exits, appending to it\033[0m" << endl;
-          errorlog.close();
+          errorlog.close();          
           errorlog.open("errorlog.txt", std::ios::app);
         } else {
           cout << "Creating file errorlog.txt" << endl;
@@ -237,6 +265,7 @@ float readAddFiles(string nameOfFile)
           }
         }
         //most of the lines below are just to format and display the time and date if an error occurs
+        //10-1 error log shows date, time and what caused the error. stoi(EKDEJLDEGDEDEFMMMFEG) can cause an error when converting string to int for example 
         errorlog << setw(2) << setfill('0') << (ptm -> tm_mon + 1) % 12 << "/" << setw(2) << setfill('0') << ptm -> tm_mday << "/" << setw(4) << setfill('0') << ptm -> tm_year + 1900 << " " <<
           setw(2) << setfill('0') << ((ptm -> tm_hour + EST) % 24 + 24) % 24 << ":" << setw(2) << setfill('0') << ptm -> tm_min << ":" << setw(2) << setfill('0') << ptm -> tm_sec << " " <<
           e.what() << "(" << tmp << ")" << " caused this error\n";
@@ -319,6 +348,7 @@ void createAccount()
     account.close();
     // Green text to let the user know that account was created successfully uses ANSI escape color codes (works in linux)
     cout << "\033[32mAccount created successfully\033[0m" << endl;
+    //3-1 the object gets deleted freeing up memory and uses delete rather than useing delete[]    
     delete person;
     
 }
@@ -358,7 +388,7 @@ void deposit()
    {
        //creates a directory called deposits returns message if there is already a directory created
        if (mkdir("deposits", 0777) == -1)
-        cerr << "Error: deposits directory already exists"<< endl;
+        cerr << "deposits directory already exists"<< endl;
 
     else
         cout << "Directory created" << endl;
@@ -369,7 +399,8 @@ void deposit()
         depositFile.open(fileName);
         if (depositFile)
         {
-        // If the file already exists  open it for append mode
+        // 2-1 format string problems streamed IO is used here
+        // If the file already exists  open it for append mode        
         cout << "File "<< fileName << " exits, appending to it" << endl;
         depositFile.close();
         //Open for appending
@@ -423,19 +454,19 @@ void deposit()
     }
 }
 // Similar to the deposit function
-void widthdraw()
+void Withdraw()
 {
     bool keyExists;
-    int widthdrawAccountNum;
-   float widthdrawAmount; 
+    int WithdrawAccountNum;
+   float WithdrawAmount; 
    string tmp;
    float temp;
    cout << "Enter a bank account number: ";
-   cin >> widthdrawAccountNum;
-   if(accountChecker(widthdrawAccountNum)==true)
+   cin >> WithdrawAccountNum;
+   if(accountChecker(WithdrawAccountNum)==true)
    {
-       //Check if that account has deposits before widthdrawing
-       textFile.open("deposits/"+encrypt(to_string(widthdrawAccountNum))+"Deposit.txt", ios::in); 
+       //Check if that account has deposits before Withdrawing
+       textFile.open("deposits/"+encrypt(to_string(WithdrawAccountNum))+"Deposit.txt", ios::in); 
         if (!textFile) 
         {
             cout << "No deposits have been made for that account"<<endl;
@@ -445,6 +476,8 @@ void widthdraw()
         {
             while (getline(textFile, tmp, '\n'))
             {
+                //4-1 uses a try catch block when creating files, float money trys to convert a string into a float value and if there is an error with this 
+                // it will be written in the errorlog.txt 
                 try 
                 {
                     float money = stof(tmp);
@@ -478,14 +511,14 @@ void widthdraw()
         }
 
        //creates a directory called deposits
-       if (mkdir("widthdraws", 0777) == -1)
-        cerr << "Error: widthdraws directory already exists"<< endl;
+       if (mkdir("withdraws", 0777) == -1)
+        cout << "withdraws directory already exists"<< endl;
 
     else
         cout << "Directory created" << endl;
         char yesNo;
         //directory/filename.txt
-        string fileName = "widthdraws/"+encrypt(to_string(widthdrawAccountNum))+"Widthdraw.txt";
+        string fileName = "withdraws/"+encrypt(to_string(WithdrawAccountNum))+"Withdraw.txt";
         //Writes account numbers to a txt file 
         depositFile.open(fileName);
         if (depositFile)
@@ -506,16 +539,16 @@ void widthdraw()
                 cout << "Error in creating "<< fileName << endl;
             }
         }
-        cout << "Enter the widthdraw amount: ";
-        cin >> widthdrawAmount;
-        while (widthdrawAmount > temp)
+        cout << "Enter the Withdraw amount: ";
+        cin >> WithdrawAmount;
+        while (WithdrawAmount > temp)
         {           
             cin.clear ();    // Restore input stream to working state
             cin.ignore ( 9 , '\n' );
             cout << "Invalid input. Try again: ";
-            cin >> widthdrawAmount;
+            cin >> WithdrawAmount;
         }
-        depositFile << fixed<< setprecision(2)<<widthdrawAmount<<endl;
+        depositFile << fixed<< setprecision(2)<<WithdrawAmount<<endl;
         depositFile.close();
         menu();
     }
@@ -530,7 +563,7 @@ void applyFee()
    {
        //creates a directory called fees
        if (mkdir("fees", 0777) == -1)
-        cerr << "Error: fees directory already exists"<< endl;
+        cout << "fees directory already exists"<< endl;
 
     else
         cout << "Directory created" << endl;
@@ -591,9 +624,9 @@ void applyFee()
         menu();
     } 
 }
-//returns a float value because all the deposits, widthdraws and fees are added up and stored in 3 different maps
-// The key in each map is an account number and the value is the total deposits in the deposit map, total widthdraws in the 
-// widthdraw map and total fees in the fees map. Balance = deposits - widthdraws - fees
+//returns a float value because all the deposits, Withdraws and fees are added up and stored in 3 different maps
+// The key in each map is an account number and the value is the total deposits in the deposit map, total Withdraws in the 
+// Withdraw map and total fees in the fees map. Balance = deposits - Withdraws - fees
 void checkBalance()
 {
     int accountNumBalance;
@@ -606,10 +639,10 @@ void checkBalance()
         // Uses function readAddFiles to read the file and add the amount in the file
         z = readAddFiles("fees/"+encrypt(to_string(accountNumBalance))+"Fees.txt");
         x = readAddFiles("deposits/"+encrypt(to_string(accountNumBalance))+"Deposit.txt");
-        y = readAddFiles("widthdraws/"+encrypt(to_string(accountNumBalance))+"Widthdraw.txt");
-       
+        y = readAddFiles("Withdraws/"+encrypt(to_string(accountNumBalance))+"Withdraw.txt");
+        // 2-2 format string problems streamed IO is used here
         cout << "Deposits: $" << fixed << setprecision(2) << x << endl;
-        cout << "Widthdraws: $" << fixed << setprecision(2) << y << endl;
+        cout << "Withdraws: $" << fixed << setprecision(2) << y << endl;
         cout << "Fees: $" << fixed << setprecision(2) << z << endl;
         balance = x - y - z;
         //negative amount = red
@@ -627,7 +660,7 @@ void checkBalance()
     }
 }
 
-// function to create the menu so it's easier to understand the functions of this program
+// 10-2 function to create the menu so it's easier to understand the functions of this program
 int menu() {
   int menuSelection;
   cout << "|=============================|" << endl;
@@ -636,7 +669,7 @@ int menu() {
   cout << "| 1.Create an account" << "         |" << endl;
   cout << "| 2.Show accounts" << "             |" << endl;
   cout << "| 3.Deposit" << "                   |" << endl;
-  cout << "| 4.Widthdraw" << "                 |" << endl;
+  cout << "| 4.Withdraw" << "                  |" << endl;
   cout << "| 5.Apply fee" << "                 |" << endl;
   cout << "| 6.Check balance" << "             |" << endl;
   cout << "| 7.Exit" << "                      |" << endl;
@@ -653,6 +686,7 @@ int menu() {
   } 
   else if (menuSelection == 2) 
   {
+    //10-3 shows the accounts that are created
     for (int i = 0; i < accountNumbers.size(); i++)
     {
         cout << "accountNumbers[" << i << "]" << " " << accountNumbers[i] << endl;
@@ -665,7 +699,7 @@ int menu() {
   } 
   else if (menuSelection == 4) 
   {
-    widthdraw();
+    Withdraw();
   } 
   else if (menuSelection == 5) 
   {
@@ -699,7 +733,7 @@ void continueExit() {
 
 //command line arguments for bank transactions
 int main(int argc, char ** argv) {
-    // While function is used here so that user needs to enter the correct password or they can't get in
+    // 13-1 While function is used here so that user needs to enter the correct password or they can't get in
     while(loggedIn==false)
     {
         login();
@@ -712,10 +746,13 @@ int main(int argc, char ** argv) {
     cout << "No such file"<<endl;
   } else {
     while (getline(textFile, tmp, '\n')) {
+      //4-2 uses a try catch block when creating files and storing account numbers in vectors/files, int num is using stoi to convert the account num to an int
+      // if it fails then it will be written in the errorlog.txt        
       try {
         cout << decrypt(tmp) << endl;         
         int num = stoi(decrypt(tmp));
         if (num >= 1000000000 && num <= INT_MAX) {
+          //3-2 using a vector to store account numbers since vectors can store changing data and the size of the vector changes
           accountNumbers.push_back(num);
         }
       } catch (std::exception & e) {
@@ -758,9 +795,9 @@ int main(int argc, char ** argv) {
     cout << "Deposit Selected" << endl;
     deposit();
 
-  } else if (argc == 2 && strcmp(argv[1], "widthdraw") == 0) {
-    cout << "Widthdraw Selected" << endl;
-    widthdraw();
+  } else if (argc == 2 && strcmp(argv[1], "Withdraw") == 0) {
+    cout << "Withdraw Selected" << endl;
+    Withdraw();
 
   } else if (argc == 2 && strcmp(argv[1], "fee") == 0) 
   {
@@ -776,7 +813,7 @@ int main(int argc, char ** argv) {
     cout << "\033[36mUse ./a.out create to create a new bank account" << endl;
     cout << "Use ./a.out show to show all the bank accounts" << endl;
     cout << "Use ./a.out deposit for a deposit" << endl;
-    cout << "Use ./a.out widthdraw for a widthdraw" << endl;
+    cout << "Use ./a.out Withdraw for a Withdraw" << endl;
     cout << "Use ./a.out fee to apply a fee" << endl;
     cout << "Use ./a.out balance for a balance inquiry" << endl;
     cout << "Use ./a.out menu to access the menu\033[0m" << endl;
