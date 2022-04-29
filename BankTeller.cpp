@@ -422,12 +422,12 @@ void widthdraw()
    cin >> widthdrawAccountNum;
    if(accountChecker(widthdrawAccountNum)==true)
    {
+       //Check if that account has deposits before widthdrawing
        textFile.open("deposits/"+encrypt(to_string(widthdrawAccountNum))+"Deposit.txt", ios::in); 
         if (!textFile) 
         {
             cout << "No deposits have been made for that account"<<endl;
-            exit(0);            
-            
+            menu();            
         } 
         else 
         {
@@ -620,18 +620,63 @@ void applyFee()
 //returns a float value because all the deposits, widthdraws and fees are added up and stored in 3 different maps
 // The key in each map is an account number and the value is the total deposits in the deposit map, total widthdraws in the 
 // widthdraw map and total fees in the fees map. Balance = deposits - widthdraws - fees
-float checkBalance(int accountNum)
+void checkBalance()
 {
+    int accountNumBalance;
     float balance,x,y,z;
-    x = depositMap.at(accountNum);
-    y = widthdrawMap.at(accountNum);
-    z = feeMap.at(accountNum);
-    cout<<x<<endl;
-    cout<<y<<endl;
-    cout<<z<<endl;
-    balance = depositMap.at(accountNum)-widthdrawMap.at(accountNum)-feeMap.at(accountNum);
-    cout << balance<<endl;
-    return 0;
+    std::map<unsigned int,float>::iterator it;
+    cout << "Enter a bank account number: ";
+    cin >> accountNumBalance;
+    if(accountChecker(accountNumBalance)==true)
+    {
+        it = depositMap.find(accountNumBalance);
+        if (it == depositMap.end())
+        {
+            x = 0;
+        }
+        else if(depositMap.empty()==true)
+        {
+            cout << "Deposits are empty"<<endl;
+        }
+        else
+        {
+            x = depositMap.at(accountNumBalance);
+        }
+        it = widthdrawMap.find(accountNumBalance);
+        if(it == widthdrawMap.end()||widthdrawMap.empty()==true)
+        {
+            y = 0;
+        }
+        else
+        {
+            y = widthdrawMap.at(accountNumBalance);
+        }
+        it = feeMap.find(accountNumBalance);
+        if(it == feeMap.end()||feeMap.empty()==true)
+        {
+            z = 0;
+        }
+        else
+        {
+            z = feeMap.at(accountNumBalance);
+        }
+        cout << "Deposits: $" << fixed << setprecision(2) << x << endl;
+        cout << "Widthdraws: $" << fixed << setprecision(2) << y << endl;
+        cout << "Fees: $" << fixed << setprecision(2) << z << endl;
+        balance = x - y - z;
+        //negative amount = red
+        if (balance < 0)
+        {
+            cout <<"\033[31mBalance: $" << balance << "\033[0m" << endl;
+        }
+        //positive amout = green
+        else if (balance > 0)
+        {
+            cout <<"\033[32mBalance: $" << balance << "\033[0m" << endl;
+        }
+        
+        menu();
+    }
 }
 
 // function to create the menu so it's easier to understand the functions of this program
@@ -680,9 +725,7 @@ int menu() {
   } 
   else if (menuSelection == 6) 
   {
-    int checkAccountBalance;
-    cin >> checkAccountBalance;
-    checkBalance(checkAccountBalance);
+    checkBalance();
   } 
   else
   {
@@ -710,10 +753,10 @@ void continueExit() {
 // *Command Injection* can occur here if the user adds ; after deposit or any other transaction
 int main(int argc, char ** argv) {
     // While function is used here so that user needs to enter the correct password or they can't get in
-    while(loggedIn==false)
+    /*while(loggedIn==false)
     {
         login();
-    }
+    }*/
   time( & rawtime);
   ptm = gmtime( & rawtime);
    string tmp;
@@ -750,7 +793,7 @@ int main(int argc, char ** argv) {
     errorlog.close();
   }
   
-  // selects type of transaction
+  // selects type of transaction using command line arguments
   if (argc == 2 && strcmp(argv[1], "create") == 0) {
     printf("Create account selected\n");
     createAccount();
