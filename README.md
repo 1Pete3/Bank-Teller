@@ -6,9 +6,14 @@ Q: What's the password?<br />
 A: **password**
 
 Q: How do I get started?<br />
-A:<br />    1. Head over to https://shell.cloud.google.com/ <br />   2. Sign in with a Google Account. <br /> 3. Make sure the terminal and editior are open by pressing these icons ![image](https://user-images.githubusercontent.com/75858369/194967286-b7b5dd1d-2f2b-4ea3-bf44-78e21b27d167.png)
-<br /> 3. Create or open a homeworkspace <br />
-4.Create a new file by going to File > New File. Name the file BankTeller.cpp. **Don't forget the .cpp file extension** <br />
+A:<br />    1. Head over to https://shell.cloud.google.com/ <br />   
+2. Sign in with a Google Account. <br /> 
+3. Make sure the terminal and editior are open by pressing these icons ![image](https://user-images.githubusercontent.com/75858369/194967286-b7b5dd1d-2f2b-4ea3-bf44-78e21b27d167.png)
+<br /> 
+4. Create or open a homeworkspace <br />
+5.Create a new file by going to File > New File. Name the file BankTeller.cpp. **Don't forget the .cpp file extension** <br />
+6. Type **g++ BankTeller.cpp** in the terminal ![image](https://user-images.githubusercontent.com/75858369/194967915-855f2535-75e7-4c01-8113-eca8572628e6.png)<br />
+
 
 
  The user uses a menu (see image below) to do certain transactions or by using command-line arguments. Available command-line arguments include: 
