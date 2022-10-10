@@ -2,6 +2,12 @@
 
 This program was created to represent the transaction that a bank teller may encounter. This program has only been tested in the google cloud shell editor so please use that. The user is required to login to the program first with a password before anything can be done. Default password is password.
 
+Q: What's the password?
+A: **password**
+
+Q: Where can I run this program?
+A: https://shell.cloud.google.com/
+
  The user uses a menu (see image below) to do certain transactions or by using command-line arguments. Available command-line arguments include: 
 *  **./a.out create** - to create a new bank account
 * 	**./a.out show** - to show all the bank accounts
