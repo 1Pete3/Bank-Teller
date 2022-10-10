@@ -3,7 +3,7 @@
 This program was created to represent the transaction that a bank teller may encounter. This program has only been tested in the google cloud shell editor so please use that. The user is required to login to the program first with a password before anything can be done. Default password is password.
 
 # How do I get started?<br />
-A:<br />    1. Head over to https://shell.cloud.google.com/ <br />   
+1. Head over to https://shell.cloud.google.com/ <br />   
 2. Sign in with a Google Account. <br /> 
 3. Make sure the terminal and editor are open by pressing these icons ![image](https://user-images.githubusercontent.com/75858369/194967286-b7b5dd1d-2f2b-4ea3-bf44-78e21b27d167.png)
 <br /> 
