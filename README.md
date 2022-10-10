@@ -13,7 +13,10 @@ A:<br />    1. Head over to https://shell.cloud.google.com/ <br />
 4. Create or open a homeworkspace <br />
 5.Create a new file by going to File > New File. Name the file BankTeller.cpp. **Don't forget the .cpp file extension** <br />
 6. Type **g++ BankTeller.cpp** in the terminal ![image](https://user-images.githubusercontent.com/75858369/194967915-855f2535-75e7-4c01-8113-eca8572628e6.png)<br />
-
+7. Type **./a.out menu** in the terminal ![image](https://user-images.githubusercontent.com/75858369/194968109-68752b10-b0d8-4424-a41a-c5f87b0393d6.png)
+ <br />
+8. Password is **password** <br />
+9. Have fun 😁<br />
 
 
  The user uses a menu (see image below) to do certain transactions or by using command-line arguments. Available command-line arguments include: 
