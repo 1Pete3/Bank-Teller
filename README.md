@@ -6,7 +6,7 @@ Q: What's the password?<br />
 A: **password**
 
 Q: How do I get started?<br />
-A:<br /> 1. Head over to https://shell.cloud.google.com/ <br />2. Sign in with a Google Account. 
+A:<br />    1. Head over to https://shell.cloud.google.com/ <br />   2. Sign in with a Google Account. 
 
  The user uses a menu (see image below) to do certain transactions or by using command-line arguments. Available command-line arguments include: 
 *  **./a.out create** - to create a new bank account
